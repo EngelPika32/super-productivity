@@ -1,3 +1,13 @@
+/**
+ * Returns the number of days from d1 to d2.
+ *
+ * * returns 0 if same day
+ * * r > 0 if d2 is after d1
+ * * r < 0 if d1 is after d2
+ * @param {Date} d1 "startDate"
+ * @param {Date} d2 "EndDate"
+ * @return {Number} number of days between two dates
+ */
 export const getDiffInDays = (d1: Date, d2: Date): number => {
   const d1Copy = new Date(d1);
   const d2Copy = new Date(d2);
