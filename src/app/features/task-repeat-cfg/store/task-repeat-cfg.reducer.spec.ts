@@ -562,6 +562,52 @@ describe('selectTaskRepeatCfgsDueOnDay', () => {
       const resultIds = result.map((item) => item.id);
       expect(resultIds).toEqual([]);
     });
+
+    it('should return cfg only if lastCreation is behind a repeatCycle match', () => {
+      const dummies = [
+        dummyRepeatable('R1', {
+          repeatCycle: 'MONTHLY',
+          startDate: '2022-01-15',
+          repeatEvery: 2,
+          lastTaskCreation: new Date('2022-01-18').getTime(),
+        }),
+      ];
+      const expected = [[], [], [], ['R1'], ['R1']];
+      const testPoints = [
+        {
+          // same month; we already created a task
+          dayDate: new Date('2022-01-30').getTime(),
+        },
+        {
+          // next month; wrong repeatCycle
+          dayDate: new Date('2022-02-18').getTime(),
+        },
+        {
+          // second month; but too early (day)
+          dayDate: new Date('2022-03-12').getTime(),
+        },
+        {
+          // second month; day after startDate → fits
+          dayDate: new Date('2022-03-18').getTime(),
+        },
+        {
+          // third month; repeatCycle does not match, but in the test we missed last month.
+          dayDate: new Date('2022-04-11').getTime(),
+        },
+      ];
+      const results = [] as any;
+      for (const t of testPoints) {
+        results.push(
+          selectTaskRepeatCfgsDueOnDay.projector(dummies, t).map((item) => item.id),
+        );
+      }
+
+      console.log('Is: \t\t', results);
+      console.log('Should:\t', expected);
+      expect(results).toEqual(expected);
+    });
+
+    // End of "for MONTHLY"
   });
 
   describe('for YEARLY', () => {
